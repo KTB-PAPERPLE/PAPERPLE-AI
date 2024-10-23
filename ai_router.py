@@ -26,7 +26,13 @@ async def post_newspaper(
     body: ai_model.APIMODEL.NewsPaperBody,
 ) -> ai_model.APIMODEL.NewsPaper:
     try:
-        return ai_service.crawl_and_write_newspaper(body.url)
+        # 신문 기사를 크롤링하고 데이터베이스에 저장
+        newspaper = ai_service.crawl_and_write_newspaper(body.url)
+        
+        # 기사 ID로 주식 정보를 추출하고 데이터베이스에 저장
+        ai_service.save_stock_info_to_db(newspaper.id)  # newspaper 객체의 id 필드를 사용
+        
+        return newspaper
     except ai_exception.URLNotCrawlableError as e:
         raise HTTPException(status_code=403, detail={"message": e.args[0]})
     except ai_exception.InvalidURLError as e:

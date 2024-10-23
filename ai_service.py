@@ -6,6 +6,7 @@ from util.url_util import get_domain_and_path
 from util.datetime_util import convert_str_to_datetime
 from model import platform
 from news_summary import get_summary
+from extract_stock import process_and_save_stock_info
 
 
 def crawl_and_write_newspaper(url: str) -> ai_model.APIMODEL.NewsPaper:
@@ -85,7 +86,46 @@ def crawl_and_write_newspaper(url: str) -> ai_model.APIMODEL.NewsPaper:
         except Exception as e:
             raise e
 
+def save_stock_info_to_db(news_id: int):
+    """
+    주식 정보를 DB에 저장합니다.
 
+    Args:
+        news_id (int): 뉴스 ID
+    """
+    print("[START] extract stock about news_id:", news_id)
+    
+    # news_id에 해당하는 뉴스 본문을 DB에서 읽어오기
+    try:
+        sql_newspaper = ai_crud.read_newspaper(link_hash=news_id)  # 또는 필요한 쿼리 사용
+        body = sql_newspaper.body
+    except Exception as e:
+        print("[EXCEPTION] Failed to read newspaper:", e)
+        return
+
+    try:
+        # 주식 정보를 분석하고 저장하기 위해 처리
+        stock_info = process_and_save_stock_info(body)
+        
+        # 주식 정보를 unpacking
+        stock_name, stock_code, current_price, last_price_change = stock_info
+
+        # DB에 저장할 주식 정보 객체 생성
+        sql_stock_info = ai_model.SQLMODEL.StockInfo(
+            news_id=news_id,  # 뉴스 ID 참조
+            stock_name=stock_name,
+            stock_code=stock_code,
+            current_price=current_price,
+            price_change=last_price_change,
+        )
+        
+        # DB에 저장
+        ai_crud.upsert_stocks([sql_stock_info])
+    except Exception as e:
+        print(f"[ERROR] Failed to save stock info: {e}")
+        # 필요시 예외를 다시 발생시키거나 로그를 남길 수 있습니다.
+    
+    
 # def get_newspapers_for_user(user_id: int) -> ai_model.APIMODEL.Newspapers:
 #     # 1. User ID로 페이지 리스트 받아오기
 #     page = 0

@@ -10,7 +10,11 @@ class InvalidURLError(Exception):
 
 class URLNotFoundError(Exception):
     def __init__(self, message="The provided URL was not found"):
-        super().__init__(message)
+        self.message = message
+        super().__init__(self.message)
+    
+    def to_dict(self):
+        return {"error": self.message}
 
 
 class URLNotCrawlableError(Exception):

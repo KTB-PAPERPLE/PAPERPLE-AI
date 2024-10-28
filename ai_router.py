@@ -26,7 +26,10 @@ async def post_newspaper(
     body: ai_model.APIMODEL.NewsPaperBody,
 ) -> ai_model.APIMODEL.NewsPaper:
     try:
-        return ai_service.crawl_and_write_newspaper(body.url)
+        # 신문 기사를 크롤링하고 데이터베이스에 저장
+        newspaper = ai_service.crawl_and_write_newspaper(body.url)
+        
+        return newspaper
     except ai_exception.URLNotCrawlableError as e:
         raise HTTPException(status_code=403, detail={"message": e.args[0]})
     except ai_exception.InvalidURLError as e:
@@ -37,6 +40,24 @@ async def post_newspaper(
         raise HTTPException(status_code=404, detail=e.to_dict())
     except Exception as e:
         raise HTTPException(status_code=500, detail={"message": str(e)})
+
+@ai_router.get(
+    "/stocks/{news_id}/",
+    response_model=list[ai_model.APIMODEL.StockInfo],
+    responses={
+        404: {"description": "Stocks not found"},
+    },
+)
+async def get_stocks(news_id: int):
+    try:
+        # 기사 ID로 주식 정보를 추출하고 데이터베이스에 저장
+        stocks = ai_service.save_stock_info_to_db(newspaper.id)  # newspaper 객체의 id 필드를 사용
+        return stocks
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail={"message": str(e)})
+
 
 
 # @ai_router.get(

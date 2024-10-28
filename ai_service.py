@@ -130,6 +130,7 @@ def save_stock_info_to_db(news_id: int):
             )
     except Exception as e:
         print(f"[ERROR] Failed to save stock info: {e}")
+        return None  # 오류 발생 시 None 반환
     
     
 # def get_newspapers_for_user(user_id: int) -> ai_model.APIMODEL.Newspapers:

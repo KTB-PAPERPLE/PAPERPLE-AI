@@ -51,8 +51,12 @@ async def post_newspaper(
 async def get_stocks(news_id: int):
     try:
         # 기사 ID로 주식 정보를 추출하고 데이터베이스에 저장
-        stocks = ai_service.save_stock_info_to_db(news_id)  # newspaper 객체의 id 필드를 사용
-        return stocks
+        stock_info = ai_service.save_stock_info_to_db(news_id)
+        
+        if stock_info is None:
+            raise HTTPException(status_code=404, detail="Stocks not found")
+
+        return [stock_info]  # 리스트 형태로 반환
     except HTTPException as e:
         raise e
     except Exception as e:

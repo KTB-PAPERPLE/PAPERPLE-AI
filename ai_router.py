@@ -26,10 +26,7 @@ async def post_newspaper(
     body: ai_model.APIMODEL.NewsPaperBody,
 ) -> ai_model.APIMODEL.NewsPaper:
     try:
-        newspaper = ai_service.crawl_and_write_newspaper(body.url)
-        if newspaper.summary is None:
-            raise HTTPException(status_code=400, detail={"message": "Summary cannot be null"})
-        return newspaper
+        return ai_service.crawl_and_write_newspaper(body.url)
     except ai_exception.URLNotCrawlableError as e:
         raise HTTPException(status_code=403, detail={"message": e.args[0]})
     except ai_exception.InvalidURLError as e:

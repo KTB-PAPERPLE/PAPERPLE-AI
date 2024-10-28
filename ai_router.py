@@ -39,8 +39,10 @@ async def post_newspaper(
         raise HTTPException(status_code=404, detail={"message": e.args[0]})
     except ai_exception.NotSupportedException as e:
         raise HTTPException(status_code=419, detail={"message": e.args[0]})
+    except ai_exception.URLNotFoundError as e:
+        raise HTTPException(status_code=404, detail=e.to_dict())
     except Exception as e:
-        raise HTTPException(status_code=500, detail={"message": e})
+        raise HTTPException(status_code=500, detail={"message": str(e)})
 
 
 # @ai_router.get(

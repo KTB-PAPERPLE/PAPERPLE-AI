@@ -59,7 +59,7 @@ def gpt_summarize(article_content):
         print(f"OpenAI API 호출 중 오류 발생: {e}")
         return None
     
-def get_summary(text: str) -> str:
+def get_summary(text: str) -> list[str]:  # 반환 타입을 List[str]로 변경
     summary = gpt_summarize(text)
     if summary:
         # 요약 결과에서 각 문장을 리스트로 변환

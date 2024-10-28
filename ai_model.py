@@ -20,6 +20,11 @@ class APIMODEL:
 
     class NewsPaperBody(BaseModel):
         url: str
+        
+    class StockInfo(BaseModel):
+        news_id: int  # 뉴스 ID 참조
+        stock_name: str
+        stock_code: str
 
 
 class SQLMODEL:
@@ -43,5 +48,5 @@ class SQLMODEL:
         news_id: int = Field(default=None, foreign_key="news_paper.id", primary_key=True)  # 뉴스 ID를 기본 키(foreign key)로 사용
         stock_name: str = Field(max_length=255)  # 관련 종목명
         stock_code: str = Field(max_length=10)  # 종목코드
-        current_price: str  # 현재가격 //쉼표표시를 위해 문자열
-        price_change: str  # 전일대비 등락가격 //쉼표표시를 위해 문자열
+        # current_price: str  # 현재가격 //쉼표표시를 위해 문자열
+        # price_change: str  # 전일대비 등락가격 //쉼표표시를 위해 문자열

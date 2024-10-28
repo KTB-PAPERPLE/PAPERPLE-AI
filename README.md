@@ -1,4 +1,4 @@
 # PAPERPLE-AI
 
 - Python 버전
-    - 3.10.11
+    - 3.12.4

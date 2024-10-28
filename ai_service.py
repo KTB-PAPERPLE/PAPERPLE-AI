@@ -86,18 +86,18 @@ def crawl_and_write_newspaper(url: str) -> ai_model.APIMODEL.NewsPaper:
         except Exception as e:
             raise e
 
-def save_stock_info_to_db(news_id: int):
+def save_stock_info_to_db(link_hash: str) -> ai_model.APIMODEL.StockInfo:
     """
     주식 정보를 DB에 저장합니다.
 
     Args:
         news_id (int): 뉴스 ID
     """
-    print("[START] extract stock about news_id:", news_id)
+    print("[START] extract stock about link_hash:", link_hash)
     
     # news_id에 해당하는 뉴스 본문을 DB에서 읽어오기
     try:
-        sql_newspaper = ai_crud.read_newspaper(news_id=news_id)
+        sql_newspaper = ai_crud.read_newspaper(link_hash=link_hash)
         body = sql_newspaper.body
     except Exception as e:
         print("[EXCEPTION] Failed to read newspaper:", e)
@@ -113,7 +113,7 @@ def save_stock_info_to_db(news_id: int):
 
         # DB에 저장할 주식 정보 객체 생성
         sql_stock_info = ai_model.SQLMODEL.StockInfo(
-            news_id=news_id,  # 뉴스 ID 참조
+            link_hash=link_hash,  # 뉴스 해시값 참조
             stock_name=stock_name,
             stock_code=stock_code,
             #current_price=current_price,
@@ -124,7 +124,7 @@ def save_stock_info_to_db(news_id: int):
         ai_crud.upsert_stocks([sql_stock_info])
         
         return ai_model.APIMODEL.StockInfo(
-                news_id=news_id,  # 뉴스 ID 참조
+                link_hash=link_hash,  # 뉴스 해시값 참조
                 stock_name=stock_name,
                 stock_code=stock_code,
             )

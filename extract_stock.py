@@ -72,7 +72,7 @@ def process_and_save_stock_info(body: str) -> tuple:
     if '정보불충분' not in stock_code:
         # 종목 정보 가져오기
         return stock_name, stock_code
-    elif stock_code=='정보불충분': # 상장 안했을 경우
+    elif stock_name!='정보불충분' and stock_code=='정보불충분': # 상장 안했을 경우
         return stock_name, 'N/A'
     else:
         # '정보불충분'인 경우 처리

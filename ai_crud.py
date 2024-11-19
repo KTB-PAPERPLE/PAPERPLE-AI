@@ -64,7 +64,7 @@ def upsert_stocks(stocks: list[SQLMODEL.StockInfo]):
     with Session(engine, expire_on_commit=False) as session:
         try:
             for stock in stocks:
-                stmt = insert(SQLMODEL.StockInfo).values(stock.model_dump())
+                stmt = insert(SQLMODEL.StockInfo).values(stock.model_dump(exclude={"id"}))
                 stmt = stmt.on_duplicate_key_update(
                     stock_name=stmt.inserted.stock_name,
                     stock_code=stmt.inserted.stock_code,
@@ -81,28 +81,25 @@ def upsert_stocks(stocks: list[SQLMODEL.StockInfo]):
             session.rollback()
             raise HTTPException(status_code=400, detail="Database integrity error: {}".format(str(e)))
 
-# def read_stock(stock_id: int) -> SQLMODEL.StockInfo:
-#     print("[START] read_stock, stock_id:", stock_id)
-#     with Session(engine, expire_on_commit=False) as session:
-#         try:
-#             statement = select(SQLMODEL.StockInfo).where(
-#                 SQLMODEL.StockInfo.id == stock_id
-#             )
-#             stock = session.exec(statement).first()
-#             if stock is None:
-#                 raise HTTPException(status_code=404, detail="Stock not found")
-#             return stock
-#         except Exception as e:
-#             print("[EXCEPTION]", e)
-#             raise ValueError
-# def test():
-#     try:
-#         newspaper = read_newspaper(
-#             link_hash="a2de8839d7f32bb07bd9505612796d7abda66a8bc2a32e0a7ac046f20f279fb2"
-#         )
-#         print(newspaper.__dir__)
-#     except Exception:
-#         print("ERROR")
+def read_newspaper_by_id(news_id: int) -> SQLMODEL.NewsPaper:
+    """
+    뉴스 ID를 기반으로 뉴스 데이터를 가져옵니다.
 
+    Args:
+        news_id (int): 뉴스 ID
 
-# test()
+    Returns:
+        SQLMODEL.NewsPaper: 뉴스 데이터 객체
+    """
+    print("[START]read_newspaper_by_id, news_id:", news_id)
+    with Session(engine, expire_on_commit=False) as session:
+        try:
+            statement = select(SQLMODEL.NewsPaper.body).where(SQLMODEL.NewsPaper.id == news_id)
+
+            newspaper = session.exec(statement).first()
+            if newspaper is None:
+                raise HTTPException(status_code=404, detail="Newspaper not found")
+            return newspaper
+        except Exception as e:
+            print("[EXCEPTION]", e)
+            raise ValueError

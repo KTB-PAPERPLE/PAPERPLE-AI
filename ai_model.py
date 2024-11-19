@@ -20,6 +20,11 @@ class APIMODEL:
 
     class NewsPaperBody(BaseModel):
         url: str
+        
+    class StockInfo(BaseModel):
+        news_id: int  # 뉴스 ID 참조
+        stock_name: str
+        stock_code: str
 
 
 class SQLMODEL:
@@ -37,3 +42,12 @@ class SQLMODEL:
         published_at: datetime = Field(
             default_factory=lambda: datetime.now(timezone.utc)
         )
+
+    class StockInfo(SQLModel, table=True):
+        __tablename__ = "stock_info"
+        id: Optional[int] = Field(default=None, primary_key=True)  # 자동 증가 설정
+        news_id: int = Field(foreign_key="news_paper.id")  # 외래 키로 설정
+        stock_name: str = Field(max_length=255)  # 관련 종목명
+        stock_code: str = Field(max_length=10)  # 종목코드
+        # current_price: str  # 현재가격 //쉼표표시를 위해 문자열
+        # price_change: str  # 전일대비 등락가격 //쉼표표시를 위해 문자열

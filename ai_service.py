@@ -97,19 +97,20 @@ def save_stock_info_to_db(news_id: int):
     
     # news_id에 해당하는 뉴스 본문을 DB에서 읽어오기
     try:
-        sql_newspaper = ai_crud.read_newspaper(news_id=news_id)
-        body = sql_newspaper.body
+        body = ai_crud.read_newspaper_by_id(news_id=news_id)
+        if not body:
+            print(f"[ERROR] No newspaper found with ID: {news_id}")
+            return None
     except Exception as e:
         print("[EXCEPTION] Failed to read newspaper:", e)
         return
 
     try:
         # 주식 정보를 분석하고 저장하기 위해 처리
-        stock_info = process_and_save_stock_info(body)
+        stock_name, stock_code = process_and_save_stock_info(body)
         
         # 주식 정보를 unpacking
         # stock_name, stock_code, current_price, last_price_change = stock_info
-        stock_name, stock_code = stock_info
 
         # DB에 저장할 주식 정보 객체 생성
         sql_stock_info = ai_model.SQLMODEL.StockInfo(
@@ -121,7 +122,11 @@ def save_stock_info_to_db(news_id: int):
         )
         
         # DB에 저장
-        ai_crud.upsert_stocks([sql_stock_info])
+        if sql_stock_info:
+            ai_crud.upsert_stocks([sql_stock_info])
+        else:
+            print("[ERROR] Stock information is empty and cannot be saved.")
+            return None
         
         return ai_model.APIMODEL.StockInfo(
                 news_id=news_id,  # 뉴스 ID 참조
@@ -131,7 +136,6 @@ def save_stock_info_to_db(news_id: int):
     except Exception as e:
         print(f"[ERROR] Failed to save stock info: {e}")
         return None  # 오류 발생 시 None 반환
-    
     
 # def get_newspapers_for_user(user_id: int) -> ai_model.APIMODEL.Newspapers:
 #     # 1. User ID로 페이지 리스트 받아오기

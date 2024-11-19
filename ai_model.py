@@ -45,7 +45,8 @@ class SQLMODEL:
 
     class StockInfo(SQLModel, table=True):
         __tablename__ = "stock_info"
-        news_id: int = Field(default=None, foreign_key="news_paper.id", primary_key=True)  # 뉴스 ID를 기본 키(foreign key)로 사용
+        id: Optional[int] = Field(default=None, primary_key=True)  # 자동 증가 설정
+        news_id: int = Field(foreign_key="news_paper.id")  # 외래 키로 설정
         stock_name: str = Field(max_length=255)  # 관련 종목명
         stock_code: str = Field(max_length=10)  # 종목코드
         # current_price: str  # 현재가격 //쉼표표시를 위해 문자열

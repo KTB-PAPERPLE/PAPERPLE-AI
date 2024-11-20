@@ -33,7 +33,7 @@ class SQLMODEL:
         id: int = Field(default=None, primary_key=True)
         title: str = Field(max_length=255)
         body: str = Field(sa_column=Text())
-        summary: list =Field(sa_column=Column(JSON))
+        summary: str = Field(sa_column=Text())  # JSON 대신 Text로 저장
         link: str = Field(max_length=2048)
         link_hash: str = Field(max_length=255, sa_column_kwargs={"unique": True})
         image: Optional[str] = Field(default=None, max_length=2048)

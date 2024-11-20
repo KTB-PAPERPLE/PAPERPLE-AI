@@ -7,7 +7,16 @@ from util.datetime_util import convert_str_to_datetime
 from model import platform
 from news_summary import get_summary
 from extract_stock import process_and_save_stock_info
+import json
 
+def decode_summary(summary):
+    """
+    JSON 데이터를 디코딩하며, 유니코드 이스케이프를 처리합니다.
+    리스트 항목에 대해 각각 디코딩을 수행합니다.
+    """
+    if isinstance(summary, list):
+        return [json.loads(f'"{item}"') if isinstance(item, str) else item for item in summary]
+    return summary
 
 def crawl_and_write_newspaper(url: str) -> ai_model.APIMODEL.NewsPaper:
     """
@@ -41,7 +50,7 @@ def crawl_and_write_newspaper(url: str) -> ai_model.APIMODEL.NewsPaper:
         newspaper = ai_crud.read_newspaper(link_hash=link_hash)
         return ai_model.APIMODEL.NewsPaper(
             title=newspaper.title,
-            summary=newspaper.summary,
+            summary=decode_summary(newspaper.summary),
             link=newspaper.link,
             image=newspaper.image,
             source=newspaper.source,
@@ -65,7 +74,7 @@ def crawl_and_write_newspaper(url: str) -> ai_model.APIMODEL.NewsPaper:
             sql_newspaper = ai_model.SQLMODEL.NewsPaper(
                 title=title,
                 body=body,
-                summary=summary,
+                summary=json.dumps(summary, ensure_ascii=False),
                 link=link,
                 link_hash=link_hash,
                 image=image,

@@ -41,26 +41,26 @@ async def post_newspaper(
     except Exception as e:
         raise HTTPException(status_code=500, detail={"message": str(e)})
 
-@ai_router.get(
-    "/stocks/{news_id}/",
-    response_model=list[ai_model.APIMODEL.StockInfo],
-    responses={
-        404: {"description": "Stocks not found"},
-    },
-)
-async def get_stocks(news_id: int):
-    try:
-        # 기사 ID로 주식 정보를 추출하고 데이터베이스에 저장
-        stock_info = ai_service.save_stock_info_to_db(news_id)
+# @ai_router.get(
+#     "/stocks/{news_id}/",
+#     response_model=list[ai_model.APIMODEL.StockInfo],
+#     responses={
+#         404: {"description": "Stocks not found"},
+#     },
+# )
+# async def get_stocks(news_id: int):
+#     try:
+#         # 기사 ID로 주식 정보를 추출하고 데이터베이스에 저장
+#         stock_info = ai_service.save_stock_info_to_db(news_id)
         
-        if stock_info is None:
-            raise HTTPException(status_code=404, detail="Stocks not found")
+#         if stock_info is None:
+#             raise HTTPException(status_code=404, detail="Stocks not found")
 
-        return [stock_info]  # 리스트 형태로 반환
-    except HTTPException as e:
-        raise e
-    except Exception as e:
-        raise HTTPException(status_code=500, detail={"message": str(e)})
+#         return [stock_info]  # 리스트 형태로 반환
+#     except HTTPException as e:
+#         raise e
+#     except Exception as e:
+#         raise HTTPException(status_code=500, detail={"message": str(e)})
 
 
 

@@ -13,6 +13,8 @@ from ai_model import SQLMODEL
 from util.hash_utils import get_sha256_hash
 from util.datetime_util import convert_NAVER_date_to_datetime
 import news_summary
+from extract_stock import process_and_save_stock_info
+
 
 # Constants
 HEADERS = {
@@ -148,8 +150,11 @@ async def main():
             image=row["image"],
             source=row["source"],
             published_at=convert_NAVER_date_to_datetime(row["published_at"]),
-        )
+            stock_name=stock_info[0],
+            stock_code=stock_info[1],
+            )
         for _, row in art_df.iterrows()
+        if (stock_info := process_and_save_stock_info(row["main"]))
     ]
 
     upsert_newspapers(newspapers=newspapers)
@@ -157,5 +162,9 @@ async def main():
 
 def run():
     print("[크롤링-NAVER]시작")
-    asyncio.run(main())
-    print("[크롤링-NAVER]종료")
+    try:
+        asyncio.run(main())
+    except Exception as e:
+        print(f"An error occurred: {e}")
+    finally:
+        print("[크롤링-NAVER]종료")

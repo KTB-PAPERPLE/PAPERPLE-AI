@@ -8,6 +8,8 @@ import pandas as pd
 import time
 import ssl
 import urllib.request
+import re
+
 
 # OpenAI API 키 설정
 load_dotenv()
@@ -49,10 +51,22 @@ def extract_stock(article_content: str) -> tuple:
                 {"role": "user", "content": prompt}
             ],
         )
+        #     # 응답 데이터 로그 출력
+        # print(f"본문: {article_content}")
 
+        # # 데이터 구조 확인
+        # if response and response.choices:
+        #     print(f"Choices: {response.choices}")
+        # else:
+        #     print("API 응답 데이터가 비어 있습니다.")
+            
         # 응답 메시지를 추출
         customer_response = response.choices[0].message.content
-        stock_data = customer_response.split('\n')
+        if customer_response == '정보불충분':
+            return '정보불충분', '정보불충분'
+        
+        cleaned_response = re.sub(r'\n+', '\n', customer_response)
+        stock_data = cleaned_response.split('\n')
 
         # 종목명과 종목코드 추출
         stock_name = stock_data[0].split(":")[1].strip() if len(stock_data) > 0 else '정보불충분'
@@ -78,6 +92,7 @@ def process_and_save_stock_info(body: str) -> tuple:
         # '정보불충분'인 경우 처리
         return 'N/A', 'N/A'
 
+
 # test
 # test='''LG이노텍은 올해 3분기 영업이익이 1304억원을 기록해 전년 동기 대비 28.9% 감소했다고 23일 밝혔다.
 
@@ -86,8 +101,8 @@ def process_and_save_stock_info(body: str) -> tuple:
 # 회사 관계자는 "고객사 신모델 양산으로 고부가 카메라 모듈 공급이 확대되고, 반도체 기판, 차량용 통신 모듈의 매출이 늘었다"고 말했다. 다만 "원·달러 환율 하락, 전기차·디스플레이 등 전방 산업의 수요 부진, 광학 사업의 공급 경쟁 심화로 영업이익은 전년 동기 대비 감소했다"고 설명했다.
 # '''
 
-# rslt=process_and_save_stock_info(test) #리스트
-# print(rslt,type(rslt))
+# stock_name, stock_code=process_and_save_stock_info(test) #리스트
+# print(stock_name, stock_code)
 
 
 # # 한국 종목 정보 가져오기

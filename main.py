@@ -41,11 +41,11 @@ async def welcome():
 
 app.include_router(ai_router.ai_router)
 
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(
-        "main:app",  # main.py 파일의 app 객체
-        host="0.0.0.0",  # 외부에서 접속 가능
-        port=8080,       # 포트 8080에서 실행
-        reload=True      # 코드 변경 시 자동 재시작 (개발 환경용)
-    )
+# if __name__ == "__main__":
+#     import uvicorn
+#     uvicorn.run(
+#         "main:app",  # main.py 파일의 app 객체
+#         host="0.0.0.0",  # 외부에서 접속 가능
+#         port=8000,       # 포트 8080에서 실행
+#         reload=True      # 코드 변경 시 자동 재시작 (개발 환경용)
+#     )

@@ -58,28 +58,28 @@ def read_newspaper(link_hash: str) -> SQLMODEL.NewsPaper:
             print("[EXCEPTION]", e)
             raise ValueError
 
-def upsert_stocks(stocks: list[SQLMODEL.StockInfo]):
-    saved_stocks = []  # 반환할 주식 정보를 저장할 리스트
+# def upsert_stocks(stocks: list[SQLMODEL.StockInfo]):
+#     saved_stocks = []  # 반환할 주식 정보를 저장할 리스트
 
-    with Session(engine, expire_on_commit=False) as session:
-        try:
-            for stock in stocks:
-                stmt = insert(SQLMODEL.StockInfo).values(stock.model_dump(exclude={"id"}))
-                stmt = stmt.on_duplicate_key_update(
-                    stock_name=stmt.inserted.stock_name,
-                    stock_code=stmt.inserted.stock_code,
-                )
-                session.exec(stmt)
+#     with Session(engine, expire_on_commit=False) as session:
+#         try:
+#             for stock in stocks:
+#                 stmt = insert(SQLMODEL.StockInfo).values(stock.model_dump(exclude={"id"}))
+#                 stmt = stmt.on_duplicate_key_update(
+#                     stock_name=stmt.inserted.stock_name,
+#                     stock_code=stmt.inserted.stock_code,
+#                 )
+#                 session.exec(stmt)
                 
-                # 삽입 또는 업데이트 후 주식 정보 추가
-                saved_stocks.append({
-                    "stock_name": stock.stock_name,
-                    "stock_code": stock.stock_code
-                })
-            session.commit()
-        except Exception as e:
-            session.rollback()
-            raise HTTPException(status_code=400, detail="Database integrity error: {}".format(str(e)))
+#                 # 삽입 또는 업데이트 후 주식 정보 추가
+#                 saved_stocks.append({
+#                     "stock_name": stock.stock_name,
+#                     "stock_code": stock.stock_code
+#                 })
+#             session.commit()
+#         except Exception as e:
+#             session.rollback()
+#             raise HTTPException(status_code=400, detail="Database integrity error: {}".format(str(e)))
 
 def read_newspaper_by_id(news_id: int) -> SQLMODEL.NewsPaper:
     """

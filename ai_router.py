@@ -16,7 +16,7 @@ ai_router = APIRouter()
     "/newspaper/",
     status_code=status.HTTP_201_CREATED,
     responses={
-        201: {"description": "Successful Response and Create Newspaper"},
+        201: {"description": "Successful Response and Create Newspaper ID"},
         403: {"description": "Forbidden, The page cannot be crawled"},
         404: {"description": "Not Found, The URL Type is not matched"},
         419: {"description": "Not Support, This platform does not support the service"},
@@ -24,12 +24,13 @@ ai_router = APIRouter()
 )
 async def post_newspaper(
     body: ai_model.APIMODEL.NewsPaperBody,
-) -> ai_model.APIMODEL.NewsPaper:
+) -> int:
+    """
+    URL로부터 뉴스 정보를 크롤링하고, DB에 저장하며, 생성된 뉴스의 ID를 반환합니다.
+    """
     try:
-        # 신문 기사를 크롤링하고 데이터베이스에 저장
         newspaper = ai_service.crawl_and_write_newspaper(body.url)
-        
-        return newspaper
+        return newspaper.id  # 뉴스 ID만 반환
     except ai_exception.URLNotCrawlableError as e:
         raise HTTPException(status_code=403, detail={"message": e.args[0]})
     except ai_exception.InvalidURLError as e:
@@ -40,6 +41,7 @@ async def post_newspaper(
         raise HTTPException(status_code=404, detail=e.to_dict())
     except Exception as e:
         raise HTTPException(status_code=500, detail={"message": str(e)})
+
 
 # @ai_router.get(
 #     "/stocks/{news_id}/",

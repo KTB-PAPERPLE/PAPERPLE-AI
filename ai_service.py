@@ -18,7 +18,7 @@ def decode_summary(summary):
         return [json.loads(f'"{item}"') if isinstance(item, str) else item for item in summary]
     return summary
 
-def crawl_and_write_newspaper(url: str) -> ai_model.APIMODEL.NewsPaper:
+def crawl_and_write_newspaper(url: str) -> ai_model.SQLMODEL.NewsPaper:
     """
     1. 해당 URL의 뉴스를 크롤링하고, 요약합니다
     2. 요약한 정보를 RDS에 저장합니다
@@ -48,16 +48,7 @@ def crawl_and_write_newspaper(url: str) -> ai_model.APIMODEL.NewsPaper:
     link_hash = get_sha256_hash(link)
     try:
         newspaper = ai_crud.read_newspaper(link_hash=link_hash)
-        return ai_model.APIMODEL.NewsPaper(
-            title=newspaper.title,
-            summary=decode_summary(newspaper.summary),
-            link=newspaper.link,
-            image=newspaper.image,
-            source=newspaper.source,
-            published_at=newspaper.published_at.isoformat(),
-            stock_name=newspaper.stock_name,
-            stock_code=newspaper.stock_code
-        )
+        return newspaper  # DB에 이미 존재하는 경우 객체 반환
 
     except Exception:
         # news 크롤링
@@ -87,23 +78,15 @@ def crawl_and_write_newspaper(url: str) -> ai_model.APIMODEL.NewsPaper:
                 published_at=published_at,
                 stock_name=stock_name,
                 stock_code=stock_code
-                
             )
             ai_crud.upsert_newspapers([sql_newspaper])
 
-            return ai_model.APIMODEL.NewsPaper(
-                title=title,
-                summary=summary,
-                link=link,
-                image=image,
-                source=source,
-                published_at=published_at.isoformat(),
-                stock_name=stock_name,
-                stock_code=stock_code
-            )
+            # 방금 저장한 뉴스의 ID를 DB에서 가져오기
+            return ai_crud.read_newspaper(link_hash=link_hash)
 
         except Exception as e:
             raise e
+
 
 # def save_stock_info_to_db(news_id: int):
 #     """

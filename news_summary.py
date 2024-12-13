@@ -60,12 +60,16 @@ def gpt_summarize(article_content):
         return None
     
 def get_summary(text: str) -> list[str]:  # 반환 타입을 List[str]로 변경
-    summary = gpt_summarize(text)
-    if summary:
-        # 요약 결과에서 각 문장을 리스트로 변환
-        summary_list = summary.splitlines()  # 줄바꿈 기준으로 분리
-        summary_list = [line.strip("* ") for line in summary_list if line.strip()]  # '*'와 공백 제거
-        return summary_list
+    try:
+        summary = gpt_summarize(text)  # GPT 기반 요약 함수 호출
+        if summary:
+            # 요약 결과를 줄바꿈 기준으로 분리하고 각 줄을 정리
+            summary_list = summary.splitlines()
+            summary_list = [line.strip("* ").strip() for line in summary_list if line.strip()]
+            return summary_list
+    except Exception as e:
+        # 예외 발생 시 오류 로그 출력
+        print(f"[ERROR] Summary generation failed: {e}")
     return []
 
 # # test

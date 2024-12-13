@@ -63,10 +63,10 @@ async def ex_tag(session, sid, page):
 
 async def re_tag(session, sid):
     """Collects unique article links for a specific sid asynchronously."""
-    tasks = [ex_tag(session, sid, i + 1) for i in range(100)]
+    tasks = [ex_tag(session, sid, i + 1) for i in range(1)] #100
     results = await tqdm_asyncio.gather(*tasks, desc=f"Collecting links for SID {sid}")
 
-    unique_links = set(link for sublist in results for link in sublist)
+    unique_links = set(link for sublist in results for link in sublist) #unique_links = set(link for sublist in results for link in sublist[:3])  # 각 페이지에서 3개의 링크만 사용
     return list(unique_links)
 
 
@@ -112,7 +112,7 @@ async def art_crawl(session, url):
 
 
 async def main():
-    sids = [100, 101, 102, 103, 104, 105]
+    sids = [100] #, 101, 102, 103, 104, 105
     all_hrefs = {}
 
     async with aiohttp.ClientSession(
@@ -144,7 +144,7 @@ async def main():
         SQLMODEL.NewsPaper(
             title=row["title"],
             body=row["main"],
-            summary=news_summary.get_summary(row["main"]),
+            summary=news_summary.get_summary(row["main"]) or [],
             link=row["link"],
             link_hash=get_sha256_hash(row["link"]),
             image=row["image"],
@@ -168,3 +168,5 @@ def run():
         print(f"An error occurred: {e}")
     finally:
         print("[크롤링-NAVER]종료")
+
+run()

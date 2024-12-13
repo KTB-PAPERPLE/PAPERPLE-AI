@@ -70,7 +70,7 @@ def crawl_and_write_newspaper(url: str) -> ai_model.SQLMODEL.NewsPaper:
             sql_newspaper = ai_model.SQLMODEL.NewsPaper(
                 title=title,
                 body=body,
-                summary=json.dumps(summary, ensure_ascii=False),
+                summary=json.dumps(news_summary.get_summary(row["main"]) or []),  # 리스트를 JSON 문자열로 변환
                 link=link,
                 link_hash=link_hash,
                 image=image,

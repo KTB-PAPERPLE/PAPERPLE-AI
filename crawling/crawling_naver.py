@@ -168,3 +168,5 @@ def run():
         print(f"An error occurred: {e}")
     finally:
         print("[크롤링-NAVER]종료")
+
+#run()

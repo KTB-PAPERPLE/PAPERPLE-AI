@@ -70,7 +70,7 @@ def crawl_and_write_newspaper(url: str) -> ai_model.SQLMODEL.NewsPaper:
             sql_newspaper = ai_model.SQLMODEL.NewsPaper(
                 title=title,
                 body=body,
-                summary=json.dumps(summary, ensure_ascii=False),
+                summary=summary or [],
                 link=link,
                 link_hash=link_hash,
                 image=image,
